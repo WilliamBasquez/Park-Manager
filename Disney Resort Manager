@@ -1,0 +1,143 @@
+/* CS 1101 - Intro to Computer Science
+ * Instructor: Dr. Akbar
+ * Challenge Lab 2
+ * Submitted by William Basquez Salas
+ */
+import java.util.Scanner;
+import java.io.*;
+public class ParkManager{
+    public static void main(String[] args)throws IOException{
+	String answer,characterName="";//These strings hold the answer as to if the user wants to find a character,view menu, and order food.
+	int total=0,itemNumber;			//These integers hold the item number for the orders, and total amound due for the order(if any).
+	String[] items = new String[9];//This arrays will hold the item names and
+	int[] price = new int[9];		//their respective prices.
+    	
+    Scanner scnr = new Scanner(System.in);
+    	
+    	String[][] characterLocations = {//Array of the location of Disney characters
+    	{"Mickey Mouse","Main Street USA"},
+    	{"Minnie Mouse", "Toon Town"},
+    	{"Goofy", "Frontier Land"},
+    	{"Pluto", "Tomorrowland"},
+    	{"Belle", "Fantasyland"},
+    	{"Jasmine", "Adventureland"}};
+    
+	System.out.println("Would you like to know where your favorite Disney character is?(Y/N)");
+	answer = scnr.nextLine();
+		if(answer.equalsIgnoreCase("Y")){
+			System.out.println("Type the name of the character you want to find");
+			characterName = scnr.nextLine();
+			System.out.println(findLocation(characterLocations,characterName));
+		}
+	System.out.println("Would you like to see our food menu?(Y/N)");
+	answer = scnr.nextLine();
+		if(!answer.equalsIgnoreCase("Y"))
+			System.out.print("Thank you and have a wonderful day!");
+		else{
+			menuItemsAndPrices();
+			System.out.println("Would you like to order some food?(Y/N)");
+			answer = scnr.next();
+				if(answer.equalsIgnoreCase("Y")){
+					while(answer.equalsIgnoreCase("Y")){
+						menuItemsToOrder();
+						System.out.println("Please insert item number");
+						itemNumber = scnr.nextInt();
+						selectedFood(items,itemNumber-1);
+						System.out.println("Do you want to keep ordering food?(Y/N)");
+						answer = scnr.next();
+						total += chosenfood(price,itemNumber-1);
+					}
+					System.out.println("Do you have an annual discount card?(Y/N)");
+					answer = scnr.next();
+					if(answer.equalsIgnoreCase("Y"))
+						System.out.printf("The amount due is $%.2f",((double)total*0.85));
+					else{
+						System.out.printf("The amount dues is: $%.2f",(double)total);
+					}
+						System.out.print("\nHave a wonderful day!");
+				}
+			else
+				System.out.print("Thank you and have a wonderful day!");
+		}
+	}
+    public static String findLocation(String[][] array, String name){
+		String location = "Sorry! The character you are looking for is not in the park today!";//This default String lets the user know that the character they are looking for is absent at the park.
+		for(int row = 0; row < array.length; row++)
+            for(int col = 0; col < array[row].length; col++)
+                if(name.equals(array[row][col]))
+	               	location =(name + " Location: " + array[row][col+1]);//If input from the user matches one of the names inside the Characters array, then 'Location' will change to the column of such character.
+  		return location;
+   	}
+   	public static void menuItemsAndPrices()throws IOException{
+		int i=1;//This variable starts the list of items, instead of starting the list at 0, it starts at 1.
+		File menu = new File("menuItems.txt");
+		File prices = new File("menuPrices.txt");
+		Scanner sc = new Scanner(menu);
+		Scanner scnr = new Scanner(prices);
+		while(sc.hasNextLine() && i<10 && scnr.hasNextLine()){//i<10, because there are only 9 items; this stops the loop at "Item 9".
+			String[] items = new String[9];//Array that stores the read input from the scanner (names).
+			int[] price = new int[9];//Array that store the values input from the second scanner (numbers).
+			for(int j = 0; j < 9; j++){//Variable used in loop.
+				items[j] = sc.nextLine();
+				price[j] = scnr.nextInt();
+				System.out.println("Item "+i+". "+items[j]+" - $"+price[j]);
+				i++;
+			}
+		}
+		sc.close();
+		scnr.close();
+	}
+	public static void menuItemsToOrder()throws IOException{//Same method as menuItemsAndPrices, but the prints are different
+		int a=1;
+		File menu = new File("menuItems.txt");
+		File prices = new File("menuPrices.txt");
+		Scanner sc = new Scanner(menu);
+		Scanner scnr = new Scanner(prices);
+		while(sc.hasNextLine() && a<10 && scnr.hasNextLine()){
+			String[] items = new String[9];
+			int[] price = new int[9];
+			for(int b = 0; b < 9; b++){
+				items[b] = sc.nextLine();
+				price[b] = scnr.nextInt();
+				System.out.println("Enter "+a+" for "+items[b]+" - $"+price[b]);
+				a++;
+			}
+		}
+		sc.close();
+		scnr.close();
+	}
+	public static void selectedFood(String[] foods, int index)throws IOException{
+		int i;//This variable will be used for the loop
+		File Foods = new File("menuItems.txt");
+		File Prices = new File("menuPrices.txt");
+		Scanner scaner = new Scanner(Foods);
+		Scanner scaner2 = new Scanner(Prices);
+		while(scaner.hasNextLine() && scaner2.hasNextLine()){
+			String[] listOfItems = new String[9];
+			int[] priceToPay = new int[9];
+			for(i = 0; i < 9; i++){
+				listOfItems[i]=scaner.nextLine();
+				priceToPay[i] = scaner2.nextInt();
+				if(i== index)
+				System.out.println("You have ordered a "+listOfItems[i]+" for $"+priceToPay[i]);
+			}
+		}
+		scaner.close();
+		scaner2.close();
+	}
+	public static int chosenfood(int[] priceforfood, int i)throws IOException{
+		int cost =0,c;
+		File prices = new File("menuPrices.txt");
+		Scanner scan = new Scanner(prices);
+		while(scan.hasNextLine() && i<9){
+			int[] array = new int[9];//Array that holds the prices of the items.
+			for(c = 0; c < 9; c++){//Variable used in loop.
+				array[c] = scan.nextInt();
+				if(i == c)
+				cost = array[i];
+			}
+		}
+		scan.close();
+		return cost;
+	}
+}
